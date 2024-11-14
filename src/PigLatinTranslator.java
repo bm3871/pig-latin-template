@@ -14,6 +14,13 @@ public class PigLatinTranslator
 
   public static String translate(String input)
   {
+    // Split the input into words and translate each word
+    String[] words = input.split(" ");
+    StringBuilder translatedSentence = new StringBuilder();
+
+    for (String word : words) [
+      translatedSentence.append(translateWord(word)).append(" ");
+    ]
     // System.out.println("Translate String: '" + input + "'");
 
     // Replace this code to translate a string input.
