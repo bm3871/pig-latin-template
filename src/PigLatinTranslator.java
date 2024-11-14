@@ -6,7 +6,6 @@ public class PigLatinTranslator
   {
     Book translatedBook = new Book();
 
-
     // Add code here to populate translatedBook with a translation of the input book.
     // Curent do-nothing code will return an empty book.
 
@@ -30,20 +29,6 @@ public class PigLatinTranslator
   {
     // System.out.println("translateWord: '" + input + "'");
 
-    // Word that starts with vowel
-    if ("AEIOUaeiou".indexOf(input.charAt(0)) != -1) {
-      return input + "ay";
-    }
-
-    // Words that start with a consonant
-    int firstVowelIndex = -1;
-    for (int i = 0; i < input.length(); i++) {
-      if ("AEIOUaeiou".indexOf(input.charAt(i)) != -1) {
-        firstVowelIndex = i;
-        break;
-      }
-    }
-    
     // Replace this code to correctly translate a single word.
     // Start here first!
     String result = input;
