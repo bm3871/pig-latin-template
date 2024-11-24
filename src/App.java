@@ -1,11 +1,9 @@
 import java.util.Arrays;
 
-
 public class App {
     public static void main(String[] args) {
         // Run test cases to validate translation logic
         TestSuite.performTests();
-
 
         // Define the books for translation
         Book[] books = {
@@ -13,26 +11,21 @@ public class App {
             new Book("The Happy Tree", "https://www.gutenberg.org/cache/epub/74787/pg74787.txt")
         };
 
-
         // Process and translate each book
         Arrays.stream(books).forEach(App::processBook);
     }
-
 
     private static void processBook(Book book) {
         // Load the book from its source
         System.out.println("Loading book: " + book.getTitle());
         book.loadFromSource();
 
-
         // Preview the original content
         System.out.println("Preview of \"" + book.getTitle() + "\":");
         book.previewContent(0, 2);
 
-
         // Translate the book content into Pig Latin
         Book translatedBook = PigLatinTranslator.convert(book);
-
 
         // Save the translated content to a file
         String outputFileName = book.getTitle().replace(" ", "_") + "_PigLatin.txt";
