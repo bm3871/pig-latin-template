@@ -5,92 +5,80 @@ import java.util.ArrayList;
 
 public class Book
 {
-    // What should a book contain?
-    // Ideas: need to store text, need to store current reading position
-    //        title, author?, source URL, ... 
     private String title;
-    private ArrayList<String> text = new ArrayList<String>();
+    private String sourceURL;
+    private ArrayList<String> content;
 
-    Book()
-    {
-        // Empty book
+    // Constructor
+    public Book() {
+        this.content = new ArrayList<>();
     }
 
-    public void printlines(int start, int length)
-    {
-        System.out.println("Lines " + start + " to " + (start + length) + " of book: " + title);
-        for (int i=start; i<start+length; i++)
-        {
-            if (i < text.size())
-            {
-                System.out.println(i + ": " + text.get(i));
-            }
-            else
-            {
-                System.out.println(i + ": line not in book.");     
-            }
-        }
+    public Book(String title, String sourceUrl) {
+        this();
+        this.title = title;
+        this.sourceUrl = sourceUrl;
     }
 
-    String getTitle()
-    {
+    public String getTitle() {
         return title;
     }
-    void setTitle(String title)
-    {
+
+    public void setTitle(String title) {
         this.title = title;
     }
 
-    String getLine(int lineNumber)
-    {
-        return text.get(lineNumber);
-    }
-
-    int getLineCount()
-    {
-        return text.size();
-    }
-
-    void appendLine(String line)
-    {
-        text.add(line);
-    }
-
-    public void readFromString(String title, String string)
-    {
-        // load a book from an input string.
-        this.title = title;
-        Scanner scanner = new Scanner(string);
-        while (scanner.hasNext()) 
-        {
-            String line = scanner.nextLine();
-            text.add(line);
+    public void loadFromSource() {
+        if (sourceUrl == null || sourceUrl.isEmpty()) {
+            System.err.println("Source URL is not provided for the book: " + title);
+            return;
         }
-        scanner.close();
-    }
-
-    public void readFromUrl(String title, String url)
-    {
-        // load a book from a URL.
-        // https://docs.oracle.com/javase/tutorial/networking/urls/readingURL.html
-        this.title = title;
 
         try {
-            URL bookUrl = new URL(url);
-            Scanner scanner = new Scanner(bookUrl.openStream());
-            while (scanner.hasNext()) 
-            {
-                text.add(scanner.nextLine());
+            URL url = new URL(sourceUrl);
+            try (Scanner scanner = new Scanner(url.openStream())) {
+                while (scanner.hasNextLine()) {
+                    content.add(scanner.nextLine());
+                }
             }
-            scanner.close();
-        }
-        catch(IOException ex) {
-            ex.printStackTrace();
+            System.out.println("Successfully loaded book: " + title);
+        } catch (IOException e) {
+            System.err.println("Error loading book from URL: " + e.getMessage());
         }
     }
 
-    void writeToFile()
-    {
-        // Add code here to write the contents of the book to a file.
+    public void previewContent(int start, int lines) {
+        System.out.println("--- Preview: " + title + " ---");
+        for (int i = start; i < start + lines; i++) {
+            if (i < content.size()) {
+                System.out.println((i + 1) + ": " + content.get(i));
+            } else {
+                System.out.println((i + 1) + ": [No more content]");
+            }
+        }
+    }
+
+    public String getLine (int lineNumber) {
+        return lineNumber >= 0 && lineNumber < content.size() ? content.get(lineNumber) : "";
+    }
+
+    public int getTotalLines() {
+        return content.size();
+    }
+
+    public void saveToFile(String fileName) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            for (String line : content) {
+                writer.write(line);
+                writer.newLine();
+            }
+            System.out.println("Content saved to file: " + fileName);
+        } catch (IOException e) {
+            System.err.println("Error saving content to file: " + e.getMessage());
+        }
+    }
+
+    public void addLine(String line) {
+        content.add(line);
     }
 }
