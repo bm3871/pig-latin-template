@@ -3,7 +3,7 @@ import java.util.Arrays;
 public class App {
     public static void main(String[] args) {
         // Run test cases to validate translation logic
-        TestSuite.performTests();
+        TestSuite.run();
 
         // Define the books for translation
         Book[] books = {
@@ -26,6 +26,10 @@ public class App {
 
         // Translate the book content into Pig Latin
         Book translatedBook = PigLatinTranslator.convert(book);
+
+        // Preview the translated content
+        System.out.println("--- Translated Preview: " + book.getTitle() + " ---");
+        translatedBook.previewContent(0, 2);
 
         // Save the translated content to a file
         String outputFileName = book.getTitle().replace(" ", "_") + "_PigLatin.txt";

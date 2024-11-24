@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class Book
 {
     private String title;
-    private String sourceURL;
+    private String sourceUrl;
     private ArrayList<String> content;
 
     // Constructor
