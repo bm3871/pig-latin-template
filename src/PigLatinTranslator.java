@@ -1,97 +1,90 @@
-import java.lang.*;
+public class PigLatinTranslator {
+  public static Book convert(Book originalBook) {
+      Book pigLatinBook = new Book();
+      pigLatinBook.setTitle(originalBook.getTitle());
 
-public class PigLatinTranslator
-{
-  public static Book translate(Book input)
-  {
-    Book translatedBook = new Book();
+      // Translate each line in the original book
+      for (int i = 0; i < originalBook.getTotalLines(); i++) {
+          String originalLine = originalBook.getLine(i);
+          String translatedLine = (originalLine == null || originalLine.trim().isEmpty())
+                  ? originalLine
+                  : translateLine(originalLine);
 
-    // Add code here to populate translatedBook with a translation of the input book.
-    // Curent do-nothing code will return an empty book.
-
-    return translatedBook;
-  }
-
-  public static String translate(String input)
-  {
-    if (input.trim().isEmpty()) return input; // Return whitespace as is
-    
-    // Split the input into words and translate each word
-    String[] words = input.split(" ");
-    StringBuilder translatedSentence = new StringBuilder();
-    
-    for (String word : words) {
-      translatedSentence.append(translateWord(word)).append(" ");
-    }
-    
-    // Return the translated sentence, trimming the trailing space
-    return translatedSentence.toString().trim();
-  }
-
-  private static String translateWord(String input)
-  {
-    if (input.isEmpty()) return input;  // Handle empty string case
-
-    // Handle punctuation at the end of the word
-    String punctuation = "";
-    if (input.matches(".*[.,!?;]$")) {
-      punctuation = input.substring(input.length() - 1);
-      input = input.substring(0, input.length() - 1);
-    }
-
-    // Handle hyphenated words (split by hyphen and process separately)
-    if (input.contains("-")) {
-      String[] parts = input.split("-");
-      StringBuilder translatedParts = new StringBuilder();
-      for (String part : parts) {
-        translatedParts.append(translatePart(part)).append("-");
+          pigLatinBook.addLine(translatedLine);
       }
-      // Remove the last hyphen and add punctuation if any
-      return translatedParts.toString().substring(0, translatedParts.length() - 1) + punctuation;
-    }
 
-    // Translate the word normally and return it with punctuation
-    return translatePart(input) + punctuation;
+      return pigLatinBook; // Return the translated book for saving
   }
 
-  private static String translatePart(String input)
-  {
-    if (input.isEmpty()) return input;  // Handle empty string case
-
-    // Capitalization preservation logic
-    String lowerCaseInput = input.toLowerCase();
-    boolean isFirstUpper = Character.isUpperCase(input.charAt(0));
-
-    // Check if the word starts with a vowel
-    if ("aeiou".indexOf(lowerCaseInput.charAt(0)) != -1) {
-      // If the word starts with a vowel, add "ay" at the end
-      return (isFirstUpper ? capitalizeFirstLetter(input) : input) + "ay";
-    }
-
-    // Find the first vowel in the word
-    int firstVowelIndex = -1;
-    for (int i = 0; i < lowerCaseInput.length(); i++) {
-      if ("aeiou".indexOf(lowerCaseInput.charAt(i)) != -1) {
-        firstVowelIndex = i;
-        break;
+  private static String translateLine(String line) {
+      if (line.trim().isEmpty()) {
+          return line; // Preserve whitespace-only lines
       }
-    }
 
-    if (firstVowelIndex != -1) {
-      // Move the consonants before the first vowel to the end and add "ay"
-      String translated = lowerCaseInput.substring(firstVowelIndex) + lowerCaseInput.substring(0, firstVowelIndex) + "ay";
-      return (isFirstUpper ? capitalizeFirstLetter(translated) : translated);
-    }
-
-    // If no vowels found, just add "ay" at the end
-    return (isFirstUpper ? capitalizeFirstLetter(input) : input) + "ay";
+      StringBuilder result = new StringBuilder();
+      String[] words = line.split(" ", -1); // Include trailing spaces
+      for (int i = 0; i < words.length; i++) {
+          result.append(translateWord(words[i]));
+          if (i < words.length - 1) {
+              result.append(" "); // Add spaces between words
+          }
+      }
+      return result.toString();
   }
 
-  // Helper method to capitalize the first letter of a word
-  private static String capitalizeFirstLetter(String input) {
-    if (input == null || input.isEmpty()) {
-      return input;
-    }
-    return input.substring(0, 1).toUpperCase() + input.substring(1).toLowerCase();
+  private static String translateWord(String word) {
+      if (word == null || word.isEmpty()) return word;
+
+      String punctuation = "";
+      while (!word.isEmpty() && !Character.isLetterOrDigit(word.charAt(word.length() - 1))) {
+          punctuation = word.charAt(word.length() - 1) + punctuation;
+          word = word.substring(0, word.length() - 1);
+      }
+
+      if (word.isEmpty()) return punctuation;
+
+      if (word.contains("-")) {
+          String[] parts = word.split("-");
+          StringBuilder translated = new StringBuilder();
+          for (int i = 0; i < parts.length; i++) {
+              translated.append(translateWord(parts[i]));
+              if (i < parts.length - 1) {
+                  translated.append("-");
+              }
+          }
+          return translated + punctuation;
+      }
+
+      char firstChar = word.charAt(0);
+      boolean isCapital = Character.isUpperCase(firstChar);
+
+      if (isVowel(Character.toLowerCase(firstChar))) {
+          return isCapital ? capitalize(word + "ay") + punctuation : word + "ay" + punctuation;
+      }
+
+      int firstVowelIndex = findFirstVowel(word);
+      if (firstVowelIndex == -1) return word + punctuation;
+
+      String pigLatinWord = word.substring(firstVowelIndex) + word.substring(0, firstVowelIndex) + "ay";
+      return isCapital ? capitalize(pigLatinWord) + punctuation : pigLatinWord + punctuation;
+  }
+
+  private static int findFirstVowel(String word) {
+      for (int i = 0; i < word.length(); i++) {
+          if (isVowel(word.charAt(i))) return i;
+      }
+      return -1;
+  }
+
+  private static boolean isVowel(char c) {
+      return "aeiou".indexOf(Character.toLowerCase(c)) >= 0;
+  }
+
+  private static String capitalize(String word) {
+      return word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase();
+  }
+
+  public static String translate(String input) {
+      return translateLine(input);
   }
 }
